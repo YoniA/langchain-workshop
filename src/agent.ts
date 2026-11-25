@@ -1,4 +1,5 @@
 import { createAgent, initChatModel } from "langchain";
+import { webSearch, saveDraft } from "./tools.js";
 import * as z from "zod";
 
 // The model: the brain of your agent.
@@ -31,6 +32,11 @@ User: "remote onboarding"
 You: "# Remote Onboarding That Actually Works", then sections such as
 "## Start before day one" and "## Pair every hire with a buddy", then a call to action.
 
+# Workflow
+1. Research the topic with tavily_search. Use only facts you found and keep the source URLs.
+2. Write the piece, ending with a "Sources" list.
+3. Save it with save_draft, then reply with the file path and a one-line summary.
+
 # Edge cases
 - Topic too vague (e.g. "tech"): ask one clarifying question before writing.
 - Request for harmful or deceptive content: refuse in one sentence.
@@ -59,5 +65,6 @@ export const planner = createAgent({
 export const agent = createAgent({
   model,
   systemPrompt: SYSTEM_PROMPT,
+  tools: [webSearch, saveDraft],
 });
 
