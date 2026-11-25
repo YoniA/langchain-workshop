@@ -5,6 +5,7 @@
   ],
   "env": ".env",
   "graphs": {
-    "agent": "./src/agent.ts:agent"
+    "agent": "./src/agent.ts:agent",
+    "planner": "./src/agent.ts:planner"
   }
 }

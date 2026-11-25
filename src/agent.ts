@@ -1,4 +1,5 @@
 import { createAgent, initChatModel } from "langchain";
+import * as z from "zod";
 
 // The model: the brain of your agent.
 const model = await initChatModel("openai:gpt-5.4-mini", {
@@ -34,6 +35,25 @@ You: "# Remote Onboarding That Actually Works", then sections such as
 - Topic too vague (e.g. "tech"): ask one clarifying question before writing.
 - Request for harmful or deceptive content: refuse in one sentence.
 `.trim();
+
+
+// A content brief: the shape every piece of content starts from.
+const ContentBrief = z.object({
+  title: z.string().describe("Working title, under 70 characters"),
+  angle: z.string().describe("The single idea that makes this piece worth reading"),
+  audience: z.string().describe("Who this is for, in one sentence"),
+  keyPoints: z.array(z.string()).min(3).max(5).describe("The points the piece must cover"),
+  format: z.enum(["blog", "linkedin", "newsletter"]).describe("Best channel for this topic"),
+  callToAction: z.string().describe("What the reader should do next"),
+});
+
+// A second agent that always answers with a ContentBrief.
+export const planner = createAgent({
+  model,
+  systemPrompt: "You are the content planner. Turn the user's topic into a content brief. Do not write the piece.",
+  responseFormat: ContentBrief,
+});
+
 
 // The agent: you will grow this into a multi-agent Content Factory today.
 export const agent = createAgent({
